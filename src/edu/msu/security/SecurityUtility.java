@@ -10,10 +10,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
@@ -23,6 +26,8 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+
+import edu.msu.model.KeyType;
 
 public class SecurityUtility {
 
@@ -37,7 +42,7 @@ public class SecurityUtility {
 	 * @return
 	 * @throws IOException
 	 */
-	public static PublicKey readKeyFromFile(String keyFileName) throws IOException {
+	public static Key readKeyFromFile(KeyType type, String keyFileName) throws IOException {
 		InputStream in = new FileInputStream(keyFileName);
 		ObjectInputStream oin = new ObjectInputStream(new BufferedInputStream(in));
 		try {
@@ -45,8 +50,13 @@ public class SecurityUtility {
 			BigInteger e = (BigInteger) oin.readObject();
 			RSAPublicKeySpec keySpec = new RSAPublicKeySpec(m, e);
 			KeyFactory fact = KeyFactory.getInstance("RSA");
-			PublicKey pubKey = fact.generatePublic(keySpec);
-			return pubKey;
+			Key key;
+			if (type == KeyType.PUBLIC)
+				key = fact.generatePublic(keySpec);
+			else {
+				key = fact.generatePrivate(keySpec);
+			}
+			return key;
 		} catch (Exception e) {
 			throw new RuntimeException("Can't generate public key spec", e);
 		} finally {
@@ -109,11 +119,11 @@ public class SecurityUtility {
 	 * @param data Cipher data represents for client's challenge
 	 * @return byte array of cipher text
 	 */
-	public static byte[] encodeRSA(PublicKey pubKey, byte[] data) {
+	public static byte[] encodeRSA(PublicKey key, byte[] data) {
 		Cipher cipher;
 		try {
 			cipher = Cipher.getInstance("RSA");
-			cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+			cipher.init(Cipher.ENCRYPT_MODE, key);
 			byte[] cipherData = cipher.doFinal(data);
 			return cipherData;
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
@@ -129,11 +139,11 @@ public class SecurityUtility {
 	 * @param data
 	 * @return byte array of plain text
 	 */
-	public static byte[] decodeRSA(PublicKey pubKey, byte[] data) {
+	public static byte[] decodeRSA(PrivateKey key, byte[] data) {
 		Cipher cipher;
 		try {
 			cipher = Cipher.getInstance("RSA");
-			cipher.init(Cipher.DECRYPT_MODE, pubKey);
+			cipher.init(Cipher.DECRYPT_MODE, key);
 			byte[] plainData = cipher.doFinal(data);
 			return plainData;
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
@@ -143,19 +153,30 @@ public class SecurityUtility {
 		}
 	}
 	
-	public String generatePlainText() {
-		StringBuilder bd = new StringBuilder();
-		for (int i = 0; i < 100; i ++) {
-			bd.append("a");
+	/**
+	 * Hash a given string
+	 * @param algorithm
+	 * @param data
+	 * @return
+	 */
+	public static byte[] digest(String algorithm, byte[] data) {
+		MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance(algorithm);
+			byte[] hash = digest.digest(data);
+			return hash;
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
 		}
-		return bd.toString();
 	}
 	
-	public static String encryptCBCMode(byte[] IV, byte[] plainText) {
+	public static byte[] encryptCBCMode(byte[] IV, byte[] plainText, TEA t) {
 		return null;
 	}
 	
-	public static String decryptCBCMode(byte[] IV, byte[] cipherText) {
+	public static byte[] decryptCBCMode(byte[] IV, byte[] cipherText, TEA t) {
 		return null;
 	}
 }
