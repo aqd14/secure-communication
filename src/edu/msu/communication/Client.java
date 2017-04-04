@@ -46,22 +46,12 @@ public class Client {
 //    	Thread.sleep(5000);
     	byte[] data = new BigInteger("39e858f86df9b909a8c87cb8d9ad599", 16).toByteArray();
     	while ((publicKey = (PublicKey) in.readObject()) != null) {
-    		byte[] challenge = SecurityUtility.generateChallenge(publicKey, data);
+    		byte[] challenge = SecurityUtility.encodeRSA(publicKey, data);
     	}
-    	
     	
     	// Send challenge to server
     	
-    	
     	// Close socket
         socket.close();
-	}
-	
-	public String generatePlainText() {
-		StringBuilder bd = new StringBuilder();
-		for (int i = 0; i < 100; i ++) {
-			bd.append("a");
-		}
-		return bd.toString();
 	}
 }

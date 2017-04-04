@@ -143,6 +143,14 @@ public class SecurityUtility {
 		}
 	}
 	
+	public String generatePlainText() {
+		StringBuilder bd = new StringBuilder();
+		for (int i = 0; i < 100; i ++) {
+			bd.append("a");
+		}
+		return bd.toString();
+	}
+	
 	public static String encryptCBCMode(byte[] IV, byte[] plainText) {
 		return null;
 	}
