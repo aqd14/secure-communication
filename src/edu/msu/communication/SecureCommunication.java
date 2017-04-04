@@ -1,3 +1,4 @@
+package edu.msu.communication;
 import java.io.IOException;
 
 /**
@@ -10,7 +11,7 @@ import java.io.IOException;
  */
 public class SecureCommunication {
 	
-	private static final int PORT = 61100;
+	private static final int PORT = 2017;
 	private static final String HOST = "localhost";
 	/**
 	 * 
@@ -27,12 +28,12 @@ public class SecureCommunication {
 		startClient();
 	}
 	
-	
-	private static void startServer() {
-		Thread t = new Thread() {
+	public static void startServer() {
+		(new Thread() {
 			@Override
 			public void run() {
 				try {
+					System.out.println("Creating server!");
 					Server server = new Server(PORT);
 					server.establishConnection();
 				} catch (IOException e) {
@@ -40,23 +41,22 @@ public class SecureCommunication {
 					e.printStackTrace();
 				}
 			}
-		};
-		t.run();
+		}).start();
 	}
 	
-	private static void startClient() {
-		Thread t = new Thread() {
+	public static void startClient() {
+		System.out.println("Creating client!");
+		(new Thread() {
 			@Override
 			public void run() {
 				try {
 					Client client = new Client(HOST, PORT);
 					client.startSender();
-				} catch (IOException | InterruptedException e) {
+				} catch (IOException | InterruptedException | ClassNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-		};
-		t.run();
+		}).start();
 	}
 }
