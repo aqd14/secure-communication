@@ -173,6 +173,8 @@ public class SecurityUtility {
 	}
 	
 	public static byte[] encryptCBCMode(byte[] IV, byte[] plainText, TEA t) {
+		// 100 bytes plain text should have 13 blocks
+		int numOfBlocks = ((plainText.length - (plainText.length % 8)) / 8) + 1;
 		return null;
 	}
 	

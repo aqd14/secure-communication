@@ -37,5 +37,9 @@ public class Cipher {
 	public void setKey(byte[] key) {
 		this.key = key;
 	}
-
+	
+	@Override
+	public String toString() {
+		return "";
+	}
 }
