@@ -172,13 +172,67 @@ public class SecurityUtility {
 		}
 	}
 	
-	public static byte[] encryptCBCMode(byte[] IV, byte[] plainText, TEA t) {
+	/**
+	 * Encrypt a plain text using CBC mode
+	 * @param IV
+	 * @param plainText
+	 * @param t
+	 * @return
+	 */
+	public static byte[][] encryptCBCMode(byte[] IV, byte[] plainText, TEA t) {
+		// The number of byte in each block
+		int blockLength = 8;
 		// 100 bytes plain text should have 13 blocks
 		int numOfBlocks = ((plainText.length - (plainText.length % 8)) / 8) + 1;
-		return null;
+		// Block cipher to store result
+		byte[][] blockCipher = new byte[numOfBlocks][blockLength];
+		// Encrypt with CBC mode
+		byte[] xorResult = null;
+		for (int block = 0; block < numOfBlocks - 1; block ++) {
+			if (block == 0) {
+				blockCipher[block] = IV;
+			} 
+			xorResult = xorByteArrays(blockCipher[block], plainText);
+			blockCipher[block+1] = t.encrypt(xorResult);
+		}
+		return blockCipher;
 	}
 	
-	public static byte[] decryptCBCMode(byte[] IV, byte[] cipherText, TEA t) {
-		return null;
+	/**
+	 * Decrypt a block cipher by using CBC mode
+	 * @param IV
+	 * @param blockCipher
+	 * @param t
+	 * @return
+	 */
+	public static byte[] decryptCBCMode(byte[] IV, byte[][] blockCipher, TEA t) {
+		// The number of byte in each block
+		int blockLength = 8;
+		// 100 bytes plain text should have 13 blocks
+		int numOfBlocks = ((IV.length - (IV.length % 8)) / 8) + 1;
+		// Block cipher to store result
+		byte[][] blockPlaintext = new byte[numOfBlocks][blockLength];
+		// Encrypt with CBC mode
+		byte[] decryptedText = null;
+		for (int block = 0; block < numOfBlocks - 1; block ++) {
+			decryptedText = t.decrypt(blockCipher[block]);
+			blockPlaintext[block] = xorByteArrays(IV, decryptedText);
+		}
+		return decryptedText;
+	}
+	
+	private static byte[] xorByteArrays(byte[] first, byte[] second) {
+		if (first.length != second.length) {
+			System.err.println("Lengths of inputs are not equal!");
+			return null;
+		}
+		int length = first.length;
+		byte[] result = new byte[length];
+		int i = 0;
+		for (byte b : first) {
+			result[i] = (byte) (b ^ second[i]);
+			i ++;
+		}
+		return result;
 	}
 }

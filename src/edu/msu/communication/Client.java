@@ -63,7 +63,7 @@ public class Client {
     	// Step 8. Client encrypts plain text string using CBC mode and TEA as block cipher. Choose IV of all zeros
     	TEA t = new TEA(key);
     	byte[] IV = {0};
-    	byte[] cipher = SecurityUtility.encryptCBCMode(IV, plainText.getBytes(StandardCharsets.UTF_8), t);
+    	byte[][] cipher = SecurityUtility.encryptCBCMode(IV, plainText.getBytes(StandardCharsets.UTF_8), t);
     	
     	// Step 9. Client encrypts key K using public key of server
     	byte[] encryptedKey = SecurityUtility.encodeRSA(publicKey, key);

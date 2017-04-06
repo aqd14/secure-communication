@@ -2,14 +2,14 @@ package edu.msu.model;
 
 public class Cipher {
 	private byte[] IV;
-	private byte[] cipherBlock;
+	private byte[][] cipherBlock;
 	private byte[] key;
 	
 	public Cipher() {
 		
 	}
 	
-	public Cipher(byte[] IV, byte[] cipherBlock, byte[] key) {
+	public Cipher(byte[] IV, byte[][] cipherBlock, byte[] key) {
 		this.IV = IV;
 		this.cipherBlock = cipherBlock;
 	}
@@ -22,11 +22,11 @@ public class Cipher {
 		IV = iV;
 	}
 	
-	public byte[] getCipherBlock() {
+	public byte[][] getCipherBlock() {
 		return cipherBlock;
 	}
 	
-	public void setCipherBlock(byte[] cipherBlock) {
+	public void setCipherBlock(byte[][] cipherBlock) {
 		this.cipherBlock = cipherBlock;
 	}
 
