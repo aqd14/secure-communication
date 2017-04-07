@@ -1,6 +1,13 @@
 package edu.msu.model;
 
-public class Cipher {
+import java.io.Serializable;
+import java.util.Arrays;
+
+public class Cipher implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private byte[] IV;
 	private byte[][] cipherBlock;
 	private byte[] key;
@@ -12,6 +19,7 @@ public class Cipher {
 	public Cipher(byte[] IV, byte[][] cipherBlock, byte[] key) {
 		this.IV = IV;
 		this.cipherBlock = cipherBlock;
+		this.key = key;
 	}
 	
 	public byte[] getIV() {
@@ -40,6 +48,11 @@ public class Cipher {
 	
 	@Override
 	public String toString() {
-		return "";
+		StringBuilder bd = new StringBuilder("Cipher: \n");
+		bd.append("IV: " + Arrays.toString(IV) + "\n");
+		bd.append("Key: " + Arrays.toString(key) + "\n");
+		bd.append("Cipher block: " + Arrays.toString(cipherBlock) + "\n");
+		bd.append("\n");
+		return bd.toString();
 	}
 }

@@ -34,7 +34,7 @@ public class SecureCommunication {
 			@Override
 			public void run() {
 				try {
-					System.out.println("Creating server!");
+//					System.out.println("Creating server!");
 					Server server = new Server(PORT);
 					server.establishConnection();
 				} catch (IOException | InvalidKeyException e) {
@@ -46,7 +46,7 @@ public class SecureCommunication {
 	}
 	
 	public static void startClient() {
-		System.out.println("Creating client!");
+//		System.out.println("Creating client!");
 		(new Thread() {
 			@Override
 			public void run() {

@@ -1,14 +1,20 @@
 package edu.msu.model;
 
-public class Challenge {
+import java.io.Serializable;
 
+public class Challenge implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private byte[] challenge;
 	
 	/**
 	 * 
 	 */
-	public Challenge() {
-		
+	public Challenge(byte[] challenge) {
+		this.challenge = challenge;
 	}
 
 	/**
@@ -31,6 +37,7 @@ public class Challenge {
 		for (int i = 0; i < challenge.length; i ++) {
 			bd.append(challenge[i]).append(" ");
 		}
+		bd.append("\n");
 		return bd.toString();
 	}
 

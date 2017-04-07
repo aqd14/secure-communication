@@ -1,11 +1,17 @@
 package edu.msu.model;
 
-public class Response {
+import java.io.Serializable;
+
+public class Response implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private byte[] response;
 	
-	public Response() {
-		// TODO Auto-generated constructor stub
+	public Response(byte[] response) {
+		this.response = response;
 	}
 
 	/**
@@ -24,10 +30,11 @@ public class Response {
 	
 	@Override
 	public String toString() {
-		StringBuilder bd = new StringBuilder("Challenge: ");
+		StringBuilder bd = new StringBuilder("Reponse: ");
 		for (int i = 0; i < response.length; i ++) {
 			bd.append(response[i]).append(" ");
 		}
+		bd.append("\n");
 		return bd.toString();
 	}
 }
