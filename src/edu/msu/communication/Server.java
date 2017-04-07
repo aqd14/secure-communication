@@ -111,6 +111,7 @@ public class Server {
         // Step 12. Server computes the hash of the decrypted message and sends the hash to client
         byte[] plainText = Utils.convert2dTo1dArray(plainTextBlock);
         plainText = Utils.removePadding(plainText);
+        System.out.println("[Server Side][DERYPTION] - Decrypted plain text: " + new String(plainText) + "\n");
         byte[] digest = SecurityUtility.digest("SHA-256", plainText);
         Hash h = new Hash(digest);
         System.out.println("[Server Side][HASH] - Sending hash to client\n");
