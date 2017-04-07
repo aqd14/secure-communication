@@ -1,5 +1,6 @@
 package edu.msu.communication;
 import java.io.IOException;
+import java.security.InvalidKeyException;
 
 /**
  * 
@@ -36,7 +37,7 @@ public class SecureCommunication {
 					System.out.println("Creating server!");
 					Server server = new Server(PORT);
 					server.establishConnection();
-				} catch (IOException e) {
+				} catch (IOException | InvalidKeyException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -52,7 +53,7 @@ public class SecureCommunication {
 				try {
 					Client client = new Client(HOST, PORT);
 					client.startSender();
-				} catch (IOException | InterruptedException | ClassNotFoundException e) {
+				} catch (IOException | InterruptedException | ClassNotFoundException | InvalidKeyException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}

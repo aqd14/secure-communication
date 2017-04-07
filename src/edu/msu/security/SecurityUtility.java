@@ -21,6 +21,7 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -179,21 +180,22 @@ public class SecurityUtility {
 	 * @param t
 	 * @return
 	 */
-	public static byte[][] encryptCBCMode(byte[] IV, byte[] plainText, TEA t) {
+	public static byte[][] encryptCBCMode(byte[] IV, byte[][] plainText, TEA t) {
 		// The number of byte in each block
 		int blockLength = 8;
 		// 100 bytes plain text should have 13 blocks
-		int numOfBlocks = ((plainText.length - (plainText.length % 8)) / 8) + 1;
+		int numOfBlocks = plainText.length;
 		// Block cipher to store result
 		byte[][] blockCipher = new byte[numOfBlocks][blockLength];
 		// Encrypt with CBC mode
 		byte[] xorResult = null;
-		for (int block = 0; block < numOfBlocks - 1; block ++) {
+		for (int block = 0; block < numOfBlocks; block ++) {
 			if (block == 0) {
-				blockCipher[block] = IV;
-			} 
-			xorResult = xorByteArrays(blockCipher[block], plainText);
-			blockCipher[block+1] = t.encrypt(xorResult);
+				xorResult = xorByteArrays(IV, plainText[0]);
+			} else {
+				xorResult = xorByteArrays(blockCipher[block-1], plainText[block]);
+			}
+			blockCipher[block] = t.encrypt(xorResult);
 		}
 		return blockCipher;
 	}
@@ -205,20 +207,24 @@ public class SecurityUtility {
 	 * @param t
 	 * @return
 	 */
-	public static byte[] decryptCBCMode(byte[] IV, byte[][] blockCipher, TEA t) {
+	public static byte[][] decryptCBCMode(byte[] IV, byte[][] blockCipher, TEA t) {
 		// The number of byte in each block
 		int blockLength = 8;
 		// 100 bytes plain text should have 13 blocks
-		int numOfBlocks = ((IV.length - (IV.length % 8)) / 8) + 1;
+		int numOfBlocks = blockCipher.length;
 		// Block cipher to store result
 		byte[][] blockPlaintext = new byte[numOfBlocks][blockLength];
 		// Encrypt with CBC mode
 		byte[] decryptedText = null;
-		for (int block = 0; block < numOfBlocks - 1; block ++) {
+		for (int block = 0; block < numOfBlocks; block ++) {
 			decryptedText = t.decrypt(blockCipher[block]);
-			blockPlaintext[block] = xorByteArrays(IV, decryptedText);
+			if (block == 0) {
+				blockPlaintext[0] = xorByteArrays(IV, decryptedText);
+			} else {
+				blockPlaintext[block] = xorByteArrays(blockCipher[block-1], decryptedText);
+			}
 		}
-		return decryptedText;
+		return blockPlaintext;
 	}
 	
 	private static byte[] xorByteArrays(byte[] first, byte[] second) {
@@ -234,5 +240,53 @@ public class SecurityUtility {
 			i ++;
 		}
 		return result;
+	}
+	
+	public static byte[][] convert1dTo2dArray(byte[] data) {
+		int length = data.length;
+		int subArrays = data.length/8;
+		if (length % 8 != 0) {
+			subArrays++;
+		}
+		byte new2dByteArray[][] = new byte[subArrays][8];
+		for (int i = 0; i < subArrays; i++) {
+			int copyLength;
+			if (i == subArrays - 1) {
+				copyLength = length % 8;
+			} else {
+				copyLength = 8;
+			}
+			System.arraycopy(data, 8*i, new2dByteArray[i], 0, copyLength);
+		}
+		return new2dByteArray;
+	}
+	
+	public static byte[] convert2dTo1dArray(byte[][] data) {
+		int length = data.length;
+		byte[] new1dByteArray = new byte[length*8];
+		int counter = 0;
+		for (int i = 0; i < length; i++) {
+			for (int j = 0; j < data[i].length; j ++) {
+				new1dByteArray[counter++] = data[i][j]; 
+			}
+		}
+		return new1dByteArray;
+	} 
+	
+	public static byte[] addPadding(byte[] data) {
+		if (data == null) {
+			return null;
+		}
+		
+		if (data.length % 8 == 0) {
+			return data;
+		}
+		
+		int newLength = data.length;
+		if (data.length % 8 != 0) {
+			newLength = newLength + (8 - (data.length % 8));
+		}
+		byte[] paddedData = Arrays.copyOf(data, newLength);
+		return paddedData;
 	}
 }

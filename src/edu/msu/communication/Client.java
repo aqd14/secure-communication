@@ -2,14 +2,17 @@ package edu.msu.communication;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
 import java.security.PublicKey;
 
 import edu.msu.model.Cipher;
+import edu.msu.model.Greeting;
 import edu.msu.security.SecurityUtility;
 import edu.msu.security.TEA;
 
@@ -33,15 +36,16 @@ public class Client {
         socket = new Socket(hostName, port);
 	}
 	
-	public void startSender() throws IOException, InterruptedException, ClassNotFoundException {
+	public void startSender() throws IOException, InterruptedException, ClassNotFoundException, InvalidKeyException {
+		ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+		ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 //        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         // Step 1. Client says hello to server
-		OutputStream out = socket.getOutputStream();
-		out.write("Hello from client!\n".getBytes(StandardCharsets.UTF_8));
+		Greeting greeting = new Greeting("Greetings from client!");
+		out.writeObject(greeting);
     	out.flush();
     	
     	// Step 4. Receive public key from server
-    	ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
     	PublicKey publicKey;
     	System.out.println("Waiting for response from server");
     	// Client send challenge to server
@@ -51,7 +55,7 @@ public class Client {
     	}
     	// Wait for response from server
     	
-    	// Step 5. Client chooses a string of 100 ‘a’s (‘aaaaaaaaa…...a’) as plain text blocks
+    	// Step 5. Client chooses a string of 100 ï¿½aï¿½s (ï¿½aaaaaaaaaï¿½...aï¿½) as plain text blocks
     	String plainText = generatePlainText();
     	
     	// Step 6. Client computes hash of plain text
@@ -62,8 +66,9 @@ public class Client {
     	
     	// Step 8. Client encrypts plain text string using CBC mode and TEA as block cipher. Choose IV of all zeros
     	TEA t = new TEA(key);
-    	byte[] IV = {0};
-    	byte[][] cipher = SecurityUtility.encryptCBCMode(IV, plainText.getBytes(StandardCharsets.UTF_8), t);
+    	byte[] IV = new byte[8];
+    	byte[][] plainData = SecurityUtility.convert1dTo2dArray(plainText.getBytes(StandardCharsets.UTF_8));
+    	byte[][] cipher = SecurityUtility.encryptCBCMode(IV, plainData, t);
     	
     	// Step 9. Client encrypts key K using public key of server
     	byte[] encryptedKey = SecurityUtility.encodeRSA(publicKey, key);
@@ -74,7 +79,6 @@ public class Client {
     	// Step 13. Client closes the connection is the hash H is correct
         socket.close();
 	}
-	
 	
 	/**
 	 * Generate a plain text contains 100 'a'
