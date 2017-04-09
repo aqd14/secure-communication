@@ -83,9 +83,10 @@ public class Client {
     	
     	// Step 6. Client computes hash of plain text
     	byte[] digest = SecurityUtility.digest("SHA-256", plainText);
+    	System.out.println("[Client Side][HASH] - Created hash from plain text: \n");
+    	System.out.println("[Client Side][HASH] - " + Arrays.toString(digest) + "\n");
     	
     	// Step 7. Client chooses random 128-bit key K
-//    	String key = "39e858f86df9b909a8c87cb8d9ad599";
     	byte key[] = new BigInteger("39e858f86df9b909a8c87cb8d9ad599", 16).toByteArray();
     	
     	// Step 8. Client encrypts plain text string using CBC mode and TEA as block cipher. Choose IV of all zeros
@@ -109,12 +110,13 @@ public class Client {
     	Hash h = (Hash) in.readObject();
     	System.out.println("[Client Side][HASH] - Received hash from server\n");
     	if (Arrays.equals(h.getDigest(), digest)) {
-    		System.out.println("[Client Side][HASH] - Hashes are matched!\n");
+    		System.out.println("[Client Side][HASH] - HASHES ARE MATCHED!\n");
     		System.out.println("[Client Side][HASH] - " + h + "\n");
     	} else {
-    		System.err.println("[Client Side][HASH] - Hashes are not matched!\n");
+    		System.err.println("[Client Side][HASH] - HASHES ARE NOT MATCHED!\n");
     		System.out.println("[Client Side][HASH] - " + h + "\n");
     	}
+    	System.out.println("[Client Side][HASH] - Close connection!\n");
     	socket.close();
 	}
 	
